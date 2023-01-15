@@ -1,3 +1,4 @@
+import DB.DBConn as DB
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -11,8 +12,12 @@ data = pd.read_csv('C:/Users/rlaxo/change-jobs/file/movies_metadata.csv', low_me
 #data = pd.read_csv('C:/Users/rlaxo/change-jobs/file/moviesInfo.csv', encoding='cp949')
 #data = pd.read_csv('C:/Users/'+getpass.getuser()+'/change-jobs/file/moviesInfo.csv', encoding='cp949')
 
-data = data.head(20000)
+obj = DB.call_exec('이예인')
+print(obj)
+obj = DB.call_procedure_mssql('PY_CallTest %s', '김태형')
+print(obj)
 
+data = data.head(20000)
 data['overview'] = data['overview'].fillna('')
 #data['줄거리'] = data['줄거리'].fillna('')
 
