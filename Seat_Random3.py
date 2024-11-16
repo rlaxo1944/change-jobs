@@ -8,7 +8,8 @@ import cv2
 import pandas as pd
 import time
 import pyautogui
-
+import DB.DBConn as DB
+import requests
 
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
@@ -31,6 +32,15 @@ class MyApp(QMainWindow):
         self.initUI()
 
     def initUI(self):
+        #
+        try :
+            external_ip = requests.get('http://ip.jsontest.com/').json()['ip']
+            data = (external_ip, '', '', '')
+            DB.call_procedure_tran('PY_insertSeatRandomLog %s, %s, %d, %d', data)
+        except requests.RequestException as e:
+            print(f'외부 ip주소 가져오기 실패 : {e}')
+
+
         #윈도우
         self.setWindowTitle('자리랜덤 배치 v1.5')
         self.setWindowIcon(QIcon(self.resource_path('favicon.png')))
@@ -253,8 +263,8 @@ class MyApp(QMainWindow):
         self.line_end = QPoint(290, line_draw)
 
         if self.inbtnHeight > 80:
-            self.inpybutton.move(130, line_Height/2+30)
-            self.outpybutton.move(130, line_Height/2+90)
+            self.inpybutton.move(130, int(line_Height/2+30))
+            self.outpybutton.move(130, int(line_Height/2+90))
 
     def keyPressEvent(self, e):
         if e.modifiers() & Qt.ShiftModifier:
@@ -384,24 +394,15 @@ class MyApp(QMainWindow):
             n = 0
             print('좌표 셋팅 시작')
             for pixmap in self.pixmap_list:
-                #print('----좌표----')
-                #print(self.Q_label_list[n].x())
-                #print(self.Q_label_list[n].y())
-                #print('----상대좌표----')
-                #print(self.Q_label_list[alist[n]].x())
-                #print(self.Q_label_list[alist[n]].y())
-                #print('----좌표종료----')
-                #tempImgX = self.Q_label_list[alist[n]].x()
-                #tempImgY = self.Q_label_list[alist[n]].y()
-                #print('----이미지좌표이동---')
-                #self.Q_label_list[alist[n]].move(self.Q_label_list[n].x(), self.Q_label_list[n].y())
                 print('--원좌표--')
                 print(self.Q_label_list[n].x())
                 print('--상대좌표--')
                 print(self.Q_label_list[alist[n]].x())
                 print('--좌표이동--')
-                self.Q_label_list[alist[n]].move(data1[n].get('x'), data1[n].get('y'))          #이름
-                self.Q_label_info_list[alist[n]].move(data2[n].get('x'), data2[n].get('y'))     #그림
+                self.Q_label_list[alist[n]].move(data1[n].get('x'), data1[n].get('y'))          #그림
+                self.Q_label_info_list[alist[n]].move(data2[n].get('x'), data2[n].get('y'))     #이름
+                print(self.Q_label_list[n].text())
+                print('----------------------------------')
 
                 n = n + 1
 
@@ -418,8 +419,16 @@ class MyApp(QMainWindow):
         time.sleep(1)
         self.bathbutton.setDisabled(False)
         QApplication.processEvents()
+
+        #data = ('ramen', 3, 5)
+        #DB.call_procedure_tran('PY_insertSeatRandomLog %s, %d, %d', data)
+
         self.threadCnt = 0
         self.show()
+
+        print(self.Q_label_info_list[0].text())
+        # for i in self.Q_label_info_list :
+        #     print(i.text())
 
     def paintEvent(self, event):
         painter = QPainter(self)

@@ -2,7 +2,8 @@
 import pymssql
 
 # DB 서버 주소
-server = '175.197.7.159'
+#server = '175.197.7.159'
+server = '27.35.75.254'
 # 데이터 베이스 이름
 database = 'changejob'
 # 접속 유저명
@@ -27,7 +28,7 @@ cursor = cnxn.cursor()
 
 #while row:
     #row = row.encode('ISO-8859-1').decode('euc-kr')
-    #print(row[0], row[1].encode('ISO-8859-1').decode('euc-kr'))
+    #print(row[0], row[1].encode('ISO-8859-1').decode('euc-kr'))터
     #print(row['empno'], row['ename'])
     #row = cursor.fetchone()
 
@@ -42,7 +43,8 @@ def call_exec(in_param=[],  func_conn=None, conn=cnxn):
     #     return [None, None]
     cursor = conn.cursor()
     try :
-        cursor.execute('SELECT * FROM emp WHERE ename = %s ;' , in_param)
+        #cursor.execute('SELECT * FROM emp WHERE ename = %s ;', in_param)
+        cursor.execute("SELECT * FROM T_SeatRandomLog", in_param)
         data = cursor.fetchall()
 
         columns = []
@@ -53,8 +55,9 @@ def call_exec(in_param=[],  func_conn=None, conn=cnxn):
         cursor.close()
         conn.close()
 
-def call_procedure_mssql(procedureName, in_param=[],  func_conn=None, conn=cnxn):
+def call_procedure_one(procedureName, in_param=[],  func_conn=None, conn=cnxn):
     conn = pymssql.connect(server, username, password, database, charset='utf8')
+    print(in_param)
     # if conn is None and func_conn is not None :
     #     conn = func_conn()
     # if conn is None :
@@ -69,6 +72,44 @@ def call_procedure_mssql(procedureName, in_param=[],  func_conn=None, conn=cnxn)
         for c in cursor.description:
             columns.append(c[0])
         return columns, data
+    finally:
+        cursor.close()
+        conn.close()
+
+def call_procedure_mult(procedureName, in_param=[],  func_conn=None, conn=cnxn):
+    conn = pymssql.connect(server, username, password, database, charset='utf8')
+    print(in_param)
+    # if conn is None and func_conn is not None :
+    #     conn = func_conn()
+    # if conn is None :
+    #     return [None, None]
+    cursor = conn.cursor()
+    try :
+        cursor.executemany(procedureName, in_param)
+        #cursor.callproc(procedureName)
+        data = cursor.fetchall()
+
+        columns = []
+        for c in cursor.description:
+            columns.append(c[0])
+        return columns, data
+    finally:
+        cursor.close()
+        conn.close()
+
+def call_procedure_tran(procedureName, in_param=[],  func_conn=None, conn=cnxn):
+    conn = pymssql.connect(server, username, password, database, charset='utf8')
+    print(in_param)
+    # if conn is None and func_conn is not None :
+    #     conn = func_conn()
+    # if conn is None :
+    #     return [None, None]
+    cursor = conn.cursor()
+    try :
+        cursor.execute(procedureName, in_param)
+        #cursor.callproc(procedureName)
+        #cursor.fetchall()
+        conn.commit()
     finally:
         cursor.close()
         conn.close()

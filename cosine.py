@@ -12,9 +12,9 @@ data = pd.read_csv('C:/Users/rlaxo/change-jobs/file/movies_metadata.csv', low_me
 #data = pd.read_csv('C:/Users/rlaxo/change-jobs/file/moviesInfo.csv', encoding='cp949')
 #data = pd.read_csv('C:/Users/'+getpass.getuser()+'/change-jobs/file/moviesInfo.csv', encoding='cp949')
 
-obj = DB.call_exec('김태형')
-print(obj)
-obj = DB.call_procedure_mssql('PY_CallTest %s', '김태형')
+#obj = DB.call_exec('김태형')
+#print(obj)
+obj = DB.call_procedure_one('PY_CallTest %s', '김태형')
 print(obj)
 
 data = data.head(20000)
